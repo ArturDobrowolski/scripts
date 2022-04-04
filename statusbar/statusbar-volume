@@ -1,0 +1,24 @@
+#!/bin/sh
+
+case $BUTTON in
+	1) sighandler signal vol_mute ;;
+	2) setsid "$TERMINAL" -e pamix & ;;
+	3) setsid "$TERMINAL" -e alsamixer & ;;
+    4) amixer -M sset Master 1%+ ;;
+esac
+
+volstat="$(amixer -M get Master)"
+
+echo $volstat | grep -q "\[off\]" && printf "🔇\\n" && exit
+
+volume="$(pamixer --get-volume)"
+
+if [ "$volume" -gt 65 ]; then
+	icon="🔊"
+elif [ "$volume" -lt 25 ]; then
+	icon="🔈"
+else
+	icon="🔉"
+fi
+
+printf "%s%% %s\\n" "$volume" "$icon"

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mem_free=$(awk '/MemAvailable/ {printf("%.3f\n", $2/1024^2)}' /proc/meminfo)
+
+icon="💻"
+printf "MemFree: %s GB %s" "$mem_free" "$icon"

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+screenshotdir="$PICS/screenshots/"
+case "$1" in
+  selection)
+    maim -s --format png /dev/stdout | xclip -selection clipboard -t image/png -i
+    ;;
+  selection_disk)
+    maim -s $screenshotdir/$(date +%s).png --format png
+    ;;
+  window)
+    maim -i $(xdotool getactivewindow) --format png /dev/stdout | xclip -selection clipboard -t image/png -i
+    ;;
+  window_disk)
+    maim -i $(xdotool getactivewindow) $screenshotdir/$(date +%s).png --format png
+    ;;
+  *)
+    exit 0
+    ;;
+esac

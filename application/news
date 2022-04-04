@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$(pgrep newsboat)" ] 
+then
+    notify-send " Newsboat is running" "Refreshing feed. Try again in a moment."
+else
+    newsboat
+    sighandler signal news
+fi

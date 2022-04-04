@@ -1,0 +1,14 @@
+#!/bin/sh
+
+device="$(cat $XDG_CONFIG_HOME/bt-devices | dmenu -i -l 2 -p "Choose device" | sed 's/^.*]\ //')"
+
+if [ ! -z $device ]
+then
+    echo "power on" | bluetoothctl
+    for i in {1..3}
+    do
+        echo "connect $device" | bluetoothctl 
+        sleep 3
+    done
+    sighandler signal vol_refresh
+fi

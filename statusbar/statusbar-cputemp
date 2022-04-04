@@ -1,0 +1,6 @@
+#!/bin/sh
+
+temp=$(sensors | grep "Package id" | head -n 1 | awk '{print $4}' | sed 's/+//')
+icon="🌡"
+
+printf "%s%s" "$temp$icon"

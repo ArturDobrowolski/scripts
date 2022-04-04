@@ -1,0 +1,15 @@
+#!/bin/sh
+
+port=$PROXY_PORT
+host=$PROXY_HOST
+
+tunnel () {
+    ssh -N -D $port $host &
+    pid=$!
+}
+
+[ ! $(ss -tlpn | grep -q $port) ] && tunnel
+
+firefox -p $USER
+
+kill $pid

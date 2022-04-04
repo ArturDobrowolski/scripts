@@ -1,0 +1,112 @@
+#!/bin/bash
+
+set -e
+
+declare -A signal_array
+signal_array[statusbar-clock]=1
+signal_array[statusbar-volume]=2
+signal_array[statusbar-battery]=3
+signal_array[statusbar-disk]=4
+signal_array[statusbar-memory]=5
+signal_array[statusbar-cputemp]=6
+signal_array[statusbar-feed]=7
+
+declare -A vulnerable
+vulnerable['statusbar-feed']='newsboat'
+
+declare -a scheduled
+scheduled=( cputemp battery clock disk memory feed )
+
+lockfile="/tmp/signal.lock"
+statusbar="dwmblocks"
+delay="0.075"
+interval="3"
+
+scheduled_update () {
+  while pgrep $statusbar >> /dev/null 2>&1
+  do
+    if [ ! -f $lockfile ]
+    then
+      for i in "${scheduled[@]}"
+      do
+        if [ "${vulnerable[statusbar-$i]}" ]
+        then
+          pgrep "${vulnerable[statusbar-$i]}" && continue
+        fi
+        pkill -RTMIN+${signal_array[statusbar-$i]} $statusbar
+        sleep 0.25
+      done
+    fi
+    sleep $interval
+  done
+}
+
+vol_inc () {
+  cmd="amixer -M sset Master 1%+ >> /dev/null 2>&1"
+  block="statusbar-volume"
+}
+
+vol_dec () {
+  cmd="amixer -M sset Master 1%- >> /dev/null 2>&1"
+  block="statusbar-volume"
+}
+
+vol_mute () {
+  cmd="amixer set Master toggle >> /dev/null 2>&1"
+  block="statusbar-volume"
+}
+
+vol_refresh () {
+  block="statusbar-volume"
+}
+
+bri_inc () {
+  cmd="xbacklight +10"
+}
+
+bri_dec () {
+  cmd="xbacklight -10"
+}
+
+news () {
+    block="statusbar-feed"
+}
+
+execute () {
+  if [ -f $lockfile ]
+  then
+    cleanup
+    exit 0
+  else
+    touch $lockfile
+    [ ! -z "$cmd" ] && sh -c "$cmd"
+    if [ ! -z $block ]
+    then
+      local signal="${signal_array[$block]}"
+      pkill -RTMIN+${signal} $statusbar
+    fi
+    cleanup
+    sleep $delay
+    rm $lockfile
+  fi
+}
+
+cleanup () {
+  unset command
+  unset signal
+  unset block
+}
+
+case "$1" in
+  schedule)
+    scheduled_update
+    ;;
+  signal)
+    "$2"
+    execute
+    ;;
+  *)
+    echo "No command specified"
+    exit 0 
+    ;;
+esac

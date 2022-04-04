@@ -1,0 +1,29 @@
+#!/bin/sh
+
+pause=600
+newsboat -x reload
+unread="$(newsboat -x print-unread | awk '{print $1}')"
+unread_old=$unread
+sighandler signal news
+
+notify()
+{
+	echo "Sending notification..."
+	notify-send " New RSS feed" "Unread: $unread"
+}
+
+[ "$unread" -gt "0" ] && notify
+
+while true; do
+	[ -z "$unread" ] && unread="0"
+	[ -z "$unread_old" ] && unread_old="0"
+	sleep "$pause"
+	[ "$(pgrep newsboat)" ] && echo "newsboat running!" && continue 
+	newsboat -x reload
+	unread="$(newsboat -x print-unread | awk '{print $1}')"
+
+	[ "$unread" -gt "$unread_old" ] && notify && sighandler signal news
+	[ "$unread" -lt "$unread_old" ] && sighandler signal news
+	unread_old=$unread
+
+done

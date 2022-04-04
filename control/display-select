@@ -1,0 +1,9 @@
+#!/bin/sh
+
+setup="$(fd . $LOCAL_ETC/display-setup | \
+	awk -F / '{print $NF}' | \
+	dmenu -p "Select display configuration: ")"
+
+[ -z $setup ] && exit 0
+$LOCAL_ETC/display-setup/$setup
+pkill set-wallpaper && set-wallpaper &

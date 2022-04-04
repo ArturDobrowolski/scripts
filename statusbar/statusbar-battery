@@ -1,0 +1,30 @@
+#!/bin/sh
+
+capacity_combined=0
+battery_count=0
+
+for battery in /sys/class/power_supply/BAT?; do
+	case "$(cat $battery/status)" in
+		"Full") status="🔋" ;;
+		"Charging") status="🔌" ;;
+		"Discharging") status="🔋" ;;
+		"Not charging") status="🔋" ;;
+		"Unknown") status="🔋" ;;
+	esac
+
+	capacity="$(cat "$battery/capacity")"
+
+	if [ "$status" = "" ]; then
+		printf "%s%s" "$capacity%$status"
+	else	
+		printf "%s%s" "$capacity%$status"
+	fi
+
+	capacity_combined=$(echo "$capacity + $capacity_combined" | bc)
+	battery_count=$(echo "$battery_count + 1" | bc)
+done 
+
+capacity_combined=$(echo "$capacity_combined / $battery_count" | bc)
+if [ $capacity_combined -lt 20 ]; then
+	echo "⚠"
+fi

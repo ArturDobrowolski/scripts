@@ -1,0 +1,10 @@
+#!/bin/sh
+
+wp_dir="$PICS/wallpapers/"
+wp_interval=300
+
+while true; do
+	wp="$(ls $wp_dir | sort -R | head -n 1)"
+	xwallpaper --center "$wp_dir/$wp"
+	sleep $wp_interval
+done

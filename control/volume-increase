@@ -1,0 +1,14 @@
+#!/bin/bash
+
+lockfile="/tmp/signal.lock"
+
+if [ -f $lockfile ]
+then
+    exit 0
+else
+    touch $lockfile
+    amixer -M sset Master 1%+
+    pkill -RTMIN+10 dwmblocks
+    sleep 0.025
+    rm $lockfile
+fi

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+case $BUTTON in
+	1) setsid "$TERMINAL" -e calcurse ;;
+esac
+
+hour=`date '+%I'`
+clock_icon='🕘'
+
+date="$(date "+%a, %d %b %Y %H:%M")"
+printf "%s  %s " "$date"
