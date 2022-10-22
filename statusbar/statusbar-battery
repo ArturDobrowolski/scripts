@@ -3,6 +3,8 @@
 capacity_combined=0
 battery_count=0
 
+[ ! -f /sys/class/power_supply/BAT? ] && exit 0
+
 for battery in /sys/class/power_supply/BAT?; do
 	case "$(cat $battery/status)" in
 		"Full") status="🔋" ;;
