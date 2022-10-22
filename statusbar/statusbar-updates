@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+import os, subprocess
+
+def sync_updates():
+    os.system("yay -Syy > /dev/null")
+
+def get_updatable():
+    return subprocess.Popen(['yay', '-Qu'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+
+#sync_updates()
+
+print(get_updatable().stdout.read().decode())
